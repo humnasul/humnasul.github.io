@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✧ hazel's desktop ✧</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --lav-bg-1:#efe6ff;
+    --lav-bg-2:#f9f3ff;
+    --purple-primary:#8f6fe0;
+    --purple-deep:#5c3fa0;
+    --purple-ink:#3b2a5e;
+    --pink:#ff9fd6;
+    --yellow:#ffe066;
+    --mint:#a3ecc9;
+    --window-bg:#fdfbff;
+    --window-border:#c9b6f2;
+    --shadow:rgba(92,63,160,0.25);
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:'Quicksand', sans-serif;
+    color:var(--purple-ink);
+    background:
+      radial-gradient(circle at 15% 20%, #fff 0%, transparent 2%),
+      radial-gradient(circle at 80% 10%, #fff 0%, transparent 2%),
+      radial-gradient(circle at 50% 60%, #fff 0%, transparent 1.5%),
+      radial-gradient(circle at 30% 80%, #fff 0%, transparent 1.5%),
+      radial-gradient(circle at 90% 70%, #fff 0%, transparent 2%),
+      linear-gradient(160deg, var(--lav-bg-1), var(--lav-bg-2) 60%, #ffe9fb 100%);
+    overflow-x:hidden;
+    cursor: default;
+  }
+
+  /* ---------- top menu bar ---------- */
+  .menubar{
+    position:sticky; top:0; z-index:500;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 22px;
+    background:rgba(255,255,255,0.6);
+    backdrop-filter: blur(10px);
+    border-bottom:2px solid var(--window-border);
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    font-size:14px;
+  }
+  .menubar .brand{ display:flex; align-items:center; gap:8px; color:var(--purple-deep); }
+  .menubar .brand .dot{ width:10px;height:10px;border-radius:50%; background:var(--pink); box-shadow:0 0 0 3px #fff, 0 0 0 4px var(--pink); }
+  .menubar nav{ display:flex; gap:22px; }
+  .menubar nav span{ cursor:pointer; opacity:.75; transition:opacity .15s; }
+  .menubar nav span:hover{ opacity:1; text-decoration: underline wavy var(--pink); }
+  #clock{ color:var(--purple-deep); }
+
+  /* ---------- desktop area ---------- */
+  .desktop{
+    position:relative;
+    min-height: calc(100vh - 120px);
+    padding: 40px 5vw 100px;
+  }
+
+  .desktop-title{
+    text-align:center;
+    margin: 10px auto 46px;
+    max-width: 640px;
+  }
+  .desktop-title h1{
+    font-family:'Fredoka', sans-serif;
+    font-size: clamp(32px, 6vw, 54px);
+    margin:0 0 6px;
+    color:var(--purple-deep);
+    text-shadow: 2px 2px 0 #fff, 4px 4px 0 var(--pink);
+  }
+  .desktop-title p{
+    margin:0;
+    font-size:16px;
+    color:var(--purple-ink);
+    opacity:.8;
+  }
+  .blink-caret{
+    display:inline-block;
+    width:2px; height:1em; background:var(--purple-deep);
+    margin-left:2px; vertical-align:-2px;
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink{ 50%{opacity:0;} }
+
+  /* ---------- desktop icons grid ---------- */
+  .icon-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap: 34px;
+    justify-content:center;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .desktop-icon{
+    width:104px;
+    text-align:center;
+    cursor:pointer;
+    user-select:none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .desktop-icon .glyph{
+    width:66px; height:66px;
+    margin:0 auto 8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:30px;
+    background: linear-gradient(160deg,#fff, var(--lav-bg-1));
+    border:2px solid var(--window-border);
+    border-radius:18px;
+    box-shadow: 0 6px 0 var(--shadow), 0 8px 14px rgba(92,63,160,.15);
+    transition: transform .15s ease;
+  }
+  .desktop-icon:hover .glyph{ transform: translateY(-4px) rotate(-3deg); }
+  .desktop-icon:active .glyph{ transform: translateY(2px); box-shadow:0 2px 0 var(--shadow); }
+  .desktop-icon .label{
+    font-family:'Fredoka', sans-serif;
+    font-size:13px;
+    font-weight:600;
+    background:rgba(255,255,255,.7);
+    border-radius:8px;
+    padding:2px 6px;
+  }
+
+  /* floaty ambient blobs */
+  .floaty{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(2px);
+    opacity:.55;
+    animation: float 7s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes float{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-18px);} }
+
+  /* ---------- pop-up windows ---------- */
+  .window{
+    position:absolute;
+    width: min(420px, 88vw);
+    background:var(--window-bg);
+    border:2px solid var(--window-border);
+    border-radius:16px;
+    box-shadow: 0 18px 0 -6px transparent, 0 20px 40px var(--shadow);
+    display:none;
+    z-index:100;
+    overflow:hidden;
+    animation: pop .28s cubic-bezier(.2,1.4,.4,1);
+  }
+  .window.open{ display:block; }
+  @keyframes pop{ from{ transform:scale(.85); opacity:0;} to{ transform:scale(1); opacity:1;} }
+
+  .titlebar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:9px 12px;
+    background: linear-gradient(120deg, var(--purple-primary), #b79bff);
+    color:#fff;
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    font-size:13px;
+    cursor:grab;
+  }
+  .titlebar:active{ cursor:grabbing; }
+  .titlebar .t-left{ display:flex; align-items:center; gap:8px; }
+  .traffic{ display:flex; gap:6px; }
+  .traffic span{ width:11px; height:11px; border-radius:50%; display:inline-block; border:1px solid rgba(0,0,0,.15); }
+  .t-pink{ background:var(--pink); }
+  .t-yellow{ background:var(--yellow); }
+  .t-mint{ background:var(--mint); }
+  .win-close{
+    background:rgba(255,255,255,.25);
+    border:none; color:#fff; width:22px; height:22px; border-radius:7px;
+    font-size:13px; cursor:pointer; line-height:1;
+  }
+  .win-close:hover{ background:rgba(255,255,255,.45); }
+
+  .win-body{ padding:18px 20px 20px; font-size:14.5px; line-height:1.55; }
+  .win-body h3{ margin:0 0 8px; font-family:'Fredoka', sans-serif; color:var(--purple-deep); font-size:18px; }
+  .win-body p{ margin:0 0 12px; }
+  .tag-row{ display:flex; flex-wrap:wrap; gap:6px; margin: 10px 0 4px; }
+  .tag{ font-size:11px; font-weight:600; background:var(--lav-bg-1); color:var(--purple-deep); padding:4px 9px; border-radius:20px; border:1px solid var(--window-border); }
+  .win-link{
+    display:inline-block; margin-top:8px;
+    font-weight:700; font-size:13px; color:var(--purple-deep);
+    text-decoration:none; border-bottom:2px solid var(--pink);
+  }
+  .win-link:hover{ color:var(--pink); }
+
+  .skill-bar-row{ margin:10px 0; }
+  .skill-bar-label{ display:flex; justify-content:space-between; font-size:12.5px; font-weight:600; margin-bottom:4px; }
+  .skill-bar{ height:9px; border-radius:6px; background:var(--lav-bg-1); overflow:hidden; border:1px solid var(--window-border); }
+  .skill-bar i{ display:block; height:100%; background:linear-gradient(90deg, var(--purple-primary), var(--pink)); border-radius:6px; }
+
+  .contact-form{ display:flex; flex-direction:column; gap:10px; }
+  .contact-form input, .contact-form textarea{
+    font-family:'Quicksand', sans-serif; font-size:13.5px;
+    padding:9px 11px; border-radius:10px; border:2px solid var(--window-border);
+    background:#fff; color:var(--purple-ink); resize:none;
+  }
+  .contact-form input:focus, .contact-form textarea:focus{ outline:2px solid var(--purple-primary); }
+  .send-btn{
+    align-self:flex-start;
+    font-family:'Fredoka', sans-serif; font-weight:600; font-size:13.5px;
+    padding:9px 18px; border-radius:10px; border:none; cursor:pointer;
+    background:var(--purple-primary); color:#fff;
+    box-shadow:0 4px 0 var(--purple-deep);
+  }
+  .send-btn:active{ transform:translateY(3px); box-shadow:0 1px 0 var(--purple-deep); }
+
+  /* ---------- taskbar ---------- */
+  .taskbar{
+    position:fixed; left:0; right:0; bottom:0; z-index:400;
+    display:flex; align-items:center; gap:10px;
+    padding:10px 16px;
+    background:rgba(255,255,255,.75);
+    backdrop-filter:blur(10px);
+    border-top:2px solid var(--window-border);
+  }
+  .start-btn{
+    font-family:'Fredoka', sans-serif; font-weight:700; font-size:13px;
+    display:flex; align-items:center; gap:6px;
+    background: linear-gradient(120deg, var(--pink), var(--purple-primary));
+    color:#fff; border:none; border-radius:10px; padding:8px 14px; cursor:pointer;
+  }
+  .task-items{ display:flex; gap:8px; flex:1; overflow-x:auto; }
+  .task-chip{
+    display:none;
+    font-size:12px; font-weight:600; font-family:'Fredoka',sans-serif;
+    background:var(--lav-bg-1); border:1px solid var(--window-border);
+    color:var(--purple-deep); padding:6px 12px; border-radius:8px;
+    cursor:pointer; white-space:nowrap;
+  }
+  .task-chip.show{ display:inline-block; }
+
+  footer.credit{
+    text-align:center; font-size:11.5px; color:var(--purple-ink); opacity:.55;
+    padding-bottom: 100px; margin-top: 20px;
+  }
+
+  @media (max-width:520px){
+    .menubar nav{ display:none; }
+    .window{ width:92vw; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="menubar">
+    <div class="brand"><span class="dot"></span> hazel.exe</div>
+    <nav>
+      <span onclick="openWin('win-about')">about</span>
+      <span onclick="openWin('win-projects')">projects</span>
+      <span onclick="openWin('win-skills')">skills</span>
+      <span onclick="openWin('win-contact')">contact</span>
+    </nav>
+    <div id="clock">--:--</div>
+  </div>
+
+  <div class="desktop" id="desktop">
+
+    <!-- ambient floaty blobs -->
+    <div class="floaty" style="width:80px;height:80px;background:var(--pink);top:8%;left:6%;animation-delay:0s;"></div>
+    <div class="floaty" style="width:50px;height:50px;background:var(--mint);top:18%;right:10%;animation-delay:1.2s;"></div>
+    <div class="floaty" style="width:36px;height:36px;background:var(--yellow);bottom:14%;left:12%;animation-delay:2.1s;"></div>
+    <div class="floaty" style="width:60px;height:60px;background:var(--purple-primary);bottom:20%;right:8%;animation-delay:.7s; opacity:.25;"></div>
+
+    <div class="desktop-title">
+      <h1>hi, i'm hazel <span class="blink-caret"></span></h1>
+      <p>front-end dev &amp; digital doodler — double-click a window to peek inside my computer ✧</p>
+    </div>
+
+    <div class="icon-grid">
+      <div class="desktop-icon" onclick="openWin('win-about')">
+        <div class="glyph">🌸</div>
+        <div class="label">about.txt</div>
+      </div>
+      <div class="desktop-icon" onclick="openWin('win-projects')">
+        <div class="glyph">💻</div>
+        <div class="label">projects</div>
+      </div>
+      <div class="desktop-icon" onclick="openWin('win-skills')">
+        <div class="glyph">🪄</div>
+        <div class="label">skills.app</div>
+      </div>
+      <div class="desktop-icon" onclick="openWin('win-contact')">
+        <div class="glyph">💌</div>
+        <div class="label">contact</div>
+      </div>
+      <div class="desktop-icon" onclick="openWin('win-fun')">
+        <div class="glyph">🍬</div>
+        <div class="label">fun_facts</div>
+      </div>
+    </div>
+
+    <!-- ===== windows ===== -->
+
+    <div class="window" id="win-about" style="top:120px; left:6%;">
+      <div class="titlebar" onmousedown="startDrag(event,'win-about')">
+        <div class="t-left"><div class="traffic"><span class="t-pink"></span><span class="t-yellow"></span><span class="t-mint"></span></div>about.txt</div>
+        <button class="win-close" onclick="closeWin('win-about')">✕</button>
+      </div>
+      <div class="win-body">
+        <h3>a little about me</h3>
+        <p>I'm a front-end developer who thinks the internet should feel like a cozy little room. I build cute, usable interfaces and sprinkle in tiny details that make people smile.</p>
+        <p>Based somewhere with too many browser tabs open, fueled by lavender lattes and side projects.</p>
+      </div>
+    </div>
+
+    <div class="window" id="win-projects" style="top:160px; left:30%;">
+      <div class="titlebar" onmousedown="startDrag(event,'win-projects')">
+        <div class="t-left"><div class="traffic"><span class="t-pink"></span><span class="t-yellow"></span><span class="t-mint"></span></div>projects</div>
+        <button class="win-close" onclick="closeWin('win-projects')">✕</button>
+      </div>
+      <div class="win-body">
+        <h3>✦ dreamlist</h3>
+        <p>A cozy to-do app with soft pastel themes and gentle reminders instead of stressful alerts.</p>
+        <div class="tag-row"><span class="tag">React</span><span class="tag">LocalStorage</span><span class="tag">CSS animation</span></div>
+        <a class="win-link" href="#">view case study →</a>
+        <hr style="border:none;border-top:1px dashed var(--window-border); margin:16px 0;">
+        <h3>✦ petal notes</h3>
+        <p>A minimal markdown notes app with a flower-growing streak tracker for daily writing habits.</p>
+        <div class="tag-row"><span class="tag">Vue</span><span class="tag">Markdown</span><span class="tag">IndexedDB</span></div>
+        <a class="win-link" href="#">view case study →</a>
+      </div>
+    </div>
+
+    <div class="window" id="win-skills" style="top:260px; left:10%;">
+      <div class="titlebar" onmousedown="startDrag(event,'win-skills')">
+        <div class="t-left"><div class="traffic"><span class="t-pink"></span><span class="t-yellow"></span><span class="t-mint"></span></div>skills.app</div>
+        <button class="win-close" onclick="closeWin('win-skills')">✕</button>
+      </div>
+      <div class="win-body">
+        <h3>toolkit</h3>
+        <div class="skill-bar-row">
+          <div class="skill-bar-label"><span>HTML / CSS</span><span>95%</span></div>
+          <div class="skill-bar"><i style="width:95%"></i></div>
+        </div>
+        <div class="skill-bar-row">
+          <div class="skill-bar-label"><span>JavaScript</span><span>85%</span></div>
+          <div class="skill-bar"><i style="width:85%"></i></div>
+        </div>
+        <div class="skill-bar-row">
+          <div class="skill-bar-label"><span>React / Vue</span><span>80%</span></div>
+          <div class="skill-bar"><i style="width:80%"></i></div>
+        </div>
+        <div class="skill-bar-row">
+          <div class="skill-bar-label"><span>UI Design</span><span>90%</span></div>
+          <div class="skill-bar"><i style="width:90%"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="window" id="win-contact" style="top:200px; left:52%;">
+      <div class="titlebar" onmousedown="startDrag(event,'win-contact')">
+        <div class="t-left"><div class="traffic"><span class="t-pink"></span><span class="t-yellow"></span><span class="t-mint"></span></div>contact</div>
+        <button class="win-close" onclick="closeWin('win-contact')">✕</button>
+      </div>
+      <div class="win-body">
+        <h3>say hello 🌷</h3>
+        <p>Have a project in mind, or just want to chat about pastel color palettes? My inbox is open.</p>
+        <form class="contact-form" onsubmit="return sendMsg(event)">
+          <input type="text" placeholder="your name" required>
+          <input type="email" placeholder="your email" required>
+          <textarea rows="3" placeholder="your message" required></textarea>
+          <button class="send-btn" type="submit">send ✦</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="window" id="win-fun" style="top:340px; left:36%;">
+      <div class="titlebar" onmousedown="startDrag(event,'win-fun')">
+        <div class="t-left"><div class="traffic"><span class="t-pink"></span><span class="t-yellow"></span><span class="t-mint"></span></div>fun_facts</div>
+        <button class="win-close" onclick="closeWin('win-fun')">✕</button>
+      </div>
+      <div class="win-body">
+        <h3>random facts about me</h3>
+        <p>🍬 I name all my side projects after desserts.</p>
+        <p>🪴 I have three plants named after CSS properties.</p>
+        <p>🎧 I code exclusively in lo-fi playlists.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="credit">made with lots of lavender &amp; a little bit of css magic ✧</footer>
+
+  <div class="taskbar">
+    <button class="start-btn" onclick="openWin('win-about')">✧ start</button>
+    <div class="task-items" id="taskItems">
+      <span class="task-chip" data-for="win-about" onclick="openWin('win-about')">about.txt</span>
+      <span class="task-chip" data-for="win-projects" onclick="openWin('win-projects')">projects</span>
+      <span class="task-chip" data-for="win-skills" onclick="openWin('win-skills')">skills.app</span>
+      <span class="task-chip" data-for="win-contact" onclick="openWin('win-contact')">contact</span>
+      <span class="task-chip" data-for="win-fun" onclick="openWin('win-fun')">fun_facts</span>
+    </div>
+  </div>
+
+<script>
+  // clock
+  function tick(){
+    const d = new Date();
+    let h = d.getHours(), m = d.getMinutes();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    document.getElementById('clock').textContent =
+      h + ':' + String(m).padStart(2,'0') + ' ' + ampm;
+  }
+  tick(); setInterval(tick, 10000);
+
+  let topZ = 100;
+
+  function openWin(id){
+    const win = document.getElementById(id);
+    win.classList.add('open');
+    win.style.zIndex = ++topZ;
+    document.querySelector('.task-chip[data-for="'+id+'"]').classList.add('show');
+  }
+  function closeWin(id){
+    document.getElementById(id).classList.remove('open');
+    document.querySelector('.task-chip[data-for="'+id+'"]').classList.remove('show');
+  }
+
+  // bring to front on click anywhere in window
+  document.querySelectorAll('.window').forEach(w=>{
+    w.addEventListener('mousedown', ()=>{ w.style.zIndex = ++topZ; });
+  });
+
+  // dragging
+  let dragTarget = null, offX = 0, offY = 0;
+  function startDrag(e, id){
+    dragTarget = document.getElementById(id);
+    const rect = dragTarget.getBoundingClientRect();
+    const desktopRect = document.getElementById('desktop').getBoundingClientRect();
+    offX = e.clientX - rect.left;
+    offY = e.clientY - rect.top;
+    dragTarget.style.zIndex = ++topZ;
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', stopDrag);
+  }
+  function onDrag(e){
+    if(!dragTarget) return;
+    const desktopRect = document.getElementById('desktop').getBoundingClientRect();
+    let left = e.clientX - desktopRect.left - offX;
+    let top = e.clientY - desktopRect.top - offY;
+    left = Math.max(-40, Math.min(left, desktopRect.width - 60));
+    top = Math.max(-10, Math.min(top, desktopRect.height - 40));
+    dragTarget.style.left = left + 'px';
+    dragTarget.style.top = top + 'px';
+  }
+  function stopDrag(){
+    dragTarget = null;
+    document.removeEventListener('mousemove', onDrag);
+    document.removeEventListener('mouseup', stopDrag);
+  }
+
+  function sendMsg(e){
+    e.preventDefault();
+    const body = e.target.closest('.window').querySelector('.win-body');
+    body.innerHTML = '<h3>sent! ✧</h3><p>Thanks for saying hi — I\'ll write back soon 💌</p>';
+    return false;
+  }
+
+  // welcome pop-up on load
+  window.addEventListener('load', ()=>{
+    setTimeout(()=> openWin('win-about'), 500);
+  });
+</script>
+</body>
+</html>
