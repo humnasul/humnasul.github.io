@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archive | Humna's Site!</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo">HS<span>.</span></a>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="index.html#recents">Recents</a>
+    <a href="index.html#experience">Experience</a>
+    <a href="index.html#contact">Contact</a>
+  </nav>
+</header>
+
+<section class="section recents" id="archive">
+  <div class="section-head reveal">
+    <div class="section-tag">ARCHIVE</div>
+    <h2>Everything I’ve been <em>doing lately.</em></h2>
+  </div>
+  <p class="archive-intro reveal">Every post, newest first. The latest few also live on the <a href="index.html#recents" style="text-decoration:underline">home page</a>.</p>
+
+  <div class="blog-feed" id="blog-feed"></div>
+  <p class="blog-more reveal"><a href="index.html#recents" class="cta secondary">← Back home</a></p>
+</section>
+
+<footer>
+  <span>Humna Sultan</span>
+  <span>Built While Drinking Mountain Dew</span>
+  <a href="#archive">BACK TO TOP ↑</a>
+</footer>
+
+<script src="posts.js"></script>
+<script>
+renderBlog("blog-feed", {groupByYear: true});
+
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach((entry)=>{
+    if(entry.isIntersecting){
+      entry.target.classList.add("visible");
+      observer.unobserve(entry.target);
+    }
+  });
+},{threshold:.12});
+document.querySelectorAll(".reveal").forEach(el=>observer.observe(el));
+</script>
+</body>
+</html>
